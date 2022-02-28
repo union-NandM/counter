@@ -1,8 +1,5 @@
 const main = document.getElementById("main");
 
-const div = "div";
-const button = "button";
-
 const input = document.getElementById("input");
 const add_button = document.getElementById("add_button");
 
@@ -61,7 +58,6 @@ class Item {
     Item.list.push(this);
 
     this.save();
-    console.log(Item.name_list);
   }
 
   increment = () => {
@@ -88,8 +84,6 @@ class Item {
   delete = (parent) => () => {
     if (window.confirm("本当に削除しますか？")) {
       parent.removeChild(this.$body);
-      console.log(this.name);
-      console.log(Item.name_list.indexOf(this.name));
 
       Item.name_list.splice(Item.name_list.indexOf(this.name), 1);
       Item.list.splice(Item.list.indexOf(this), 1);
@@ -99,7 +93,6 @@ class Item {
         item.save();
       });
 
-      console.log(Item.name_list);
       delete this;
     }
   };
@@ -141,7 +134,6 @@ const checkFormat = (obj) => {
 };
 
 window.onload = () => {
-  let succeed_parse = true;
   const data = Object.keys(localStorage).map((key) => {
     try {
       const obj = JSON.parse(localStorage.getItem(key));
