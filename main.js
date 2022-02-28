@@ -77,7 +77,12 @@ class Item {
   };
 
   save = () => {
-    localStorage.setItem(this.name, this.counter);
+    const order = Item.name_list.indexOf(this.name);
+    const val = {
+      count: this.counter,
+      order: order,
+    };
+    localStorage.setItem(this.name, JSON.stringify(val));
   };
 
   delete = (parent) => () => {
@@ -87,8 +92,12 @@ class Item {
       console.log(Item.name_list.indexOf(this.name));
 
       Item.name_list.splice(Item.name_list.indexOf(this.name), 1);
-      Item.name_list.splice(Item.list.indexOf(this), 1);
+      Item.list.splice(Item.list.indexOf(this), 1);
       localStorage.removeItem(this.name);
+
+      Item.list.forEach((item) => {
+        item.save();
+      });
 
       console.log(Item.name_list);
       delete this;
@@ -123,8 +132,41 @@ add_button.addEventListener("click", () => {
   input.value = "";
 });
 
+const checkFormat = (obj) => {
+  return (
+    Number.isSafeInteger(obj?.order) &&
+    (typeof obj?.name).toLowerCase() === "string" &&
+    Number.isSafeInteger(obj?.count)
+  );
+};
+
 window.onload = () => {
-  Object.keys(localStorage).forEach((key) => {
-    main.appendChild(new Item(key, main, localStorage.getItem(key)).$body);
+  let succeed_parse = true;
+  const data = Object.keys(localStorage).map((key) => {
+    try {
+      const obj = JSON.parse(localStorage.getItem(key));
+      return { ...obj, name: key };
+    } catch (e) {
+      return {};
+    }
   });
+
+  const arr = new Array(data.length);
+
+  for (const datam of data) {
+    if (!checkFormat(datam)) {
+      localStorage.clear();
+      return;
+    }
+    arr[datam.order] = { name: datam.name, count: datam.count };
+  }
+
+  if (arr.includes(undefined)) {
+    localStorage.clear();
+    return;
+  }
+
+  for (const item of arr) {
+    main.appendChild(new Item(item.name, main, item.count).$body);
+  }
 };
